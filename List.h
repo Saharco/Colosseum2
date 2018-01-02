@@ -16,17 +16,13 @@ class List {
         Node *previous;
 
         Node() {
-            next = nullptr;
-            previous = nullptr;
+            next = NULL;
+            previous = NULL;
         }
 
         Node(T data, Node *next, Node *previous) : next(next),
                                                    previous(previous),
                                                    data(data) {}
-
-        Node(const Node &node) = default;
-
-        ~Node() = default;
 
         bool operator==(const Node &node) const {
             return (next == node.next && previous == node.previous &&
@@ -81,8 +77,6 @@ public:
         friend class List;
 
     public:
-        ~Iterator() = default;
-        Iterator(const Iterator &iterator) = default;
 
         Iterator operator=(const Iterator &iterator){
             current=iterator.current;
@@ -97,14 +91,14 @@ public:
         }
 
         Iterator operator++(int) {
-            //assert(current != list_p->tail->next && current != nullptr);
+            //assert(current != list_p->tail->next && current != NULL);
             Iterator temp = *this;
             ++(*this);
             return temp;
         }
 
         Iterator &operator--() {
-            assert(current != list_p->tail && current != nullptr);
+            assert(current != list_p->tail && current != NULL);
             current = current->previous;
             return *this;
         }
@@ -126,7 +120,7 @@ public:
         }
 
         T &operator*() const {
-            if (current == nullptr || current == list_p->head ||
+            if (current == NULL || current == list_p->head ||
                 current == list_p->tail->next) {
                 throw ElementDoesntExist();
             }
@@ -154,9 +148,9 @@ public:
         head = new Node();
         tail = new Node();
         head->next = tail;
-        head->previous = nullptr;
+        head->previous = NULL;
         tail->previous = head;
-        tail->next = nullptr;
+        tail->next = NULL;
         size = 0;
     }
 
@@ -164,9 +158,9 @@ public:
         head = new Node();
         tail = new Node();
         head->next = tail;
-        head->previous = nullptr;
+        head->previous = NULL;
         tail->previous = head;
-        tail->next = nullptr;
+        tail->next = NULL;
         size = 0;
         for (Iterator iterator = list.begin();
              iterator != list.end(); iterator++) {
