@@ -8,8 +8,6 @@
 #include <assert.h>
 #include "Exceptions.h"
 
-
-using namespace mtm;
 template<class T>
 class List {
     class Node {
@@ -130,7 +128,7 @@ public:
         T &operator*() const {
             if (current == nullptr || current == list_p->head ||
                 current == list_p->tail->next) {
-                throw ListExceptions::ElementNotFound();
+                throw ElementDoesntExist();
             }
             return current->data;
         }
@@ -192,7 +190,7 @@ public:
     }
     void insert(const T &data, const Iterator &iterator) {
         if (iterator.list_p != this || iterator == ++end()) {
-            throw ListExceptions::ElementNotFound();
+            throw ElementDoesntExist();
         }
         Node *new_node = new Node(data, iterator.current,
                                   iterator.current->previous);
@@ -207,7 +205,7 @@ public:
 
     void remove(Iterator &iterator) {
         if (iterator.list_p != this || iterator.current == tail) {
-            throw ListExceptions::ElementNotFound();
+            throw ElementDoesntExist();
         }
         Node *temp_next = iterator.current->next;
         Node *temp_prev = iterator.current->previous;
@@ -235,13 +233,13 @@ public:
         }
     }
 
-    template<class Predicate>
-    Iterator find(const Predicate &predicate) {
+    Iterator find(const T& x) {
         for (Iterator i = (*this).begin(); i != (*this).end(); i++) {
-            if (predicate(i.operator*()))
+            if (i.operator*() == x) {
                 return i;
+            }
         }
-        return (end());
+        throw ElementDoesntExist();
     }
 };
 

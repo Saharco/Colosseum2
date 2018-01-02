@@ -2,21 +2,16 @@
 #define HASHTABLE_HASHTABLE_H
 
 #include <exception>
-#include "AVL.h"
-/*
- * an open addressing hashtable. expand_factor and initial size must be coprime with r(x)
- */
-class ElementAlreadyExists : public std::exception{};
-class ElementDoesntExist : public std::exception{};
-// important note: only objects that have the == overloaded operator can be used.
+#include "List.h"
 template<class T>
 class HashTable {
-    AVLTree<T> **table;
-    int max_size;
-    int current_size;
+    List<T> **table;
+    int table_length;
+    int num_elements;
     int expand_factor;
-    int h(const T& x);
+    int h(const T& x);          //NEED CHANGES
     void expand();
+    typename List<T>::Iterator find(const T& x);
 public:
     HashTable(int initial_size,int expand_factor);
     void insert(const T& x);
@@ -24,70 +19,74 @@ public:
     bool member(const T& x);
 };
 template <class T>
-int HashTable::h(const T &x) {
-    return x%max_size;
+int HashTable<T>::h(const T &x) {
+    return x%table_length;
 }
 template <class T>
-void HashTable::expand() {
-    AVLTree<T>** new_table=new AVLTree<T> *[max_size*expand_factor];
-    for(int i=0;i<max_size*expand_factor;i++){
-        new_table[i]= nullptr;
+void HashTable<T>::expand() {
+    List<T>** new_table=new List<T> *[table_length*expand_factor];
+    for(int i=0;i<table_length*expand_factor;i++){
+        new_table[i]= new List<T>();
     }
-    max_size=max_size*expand_factor;
-    for(int i=0;i<max_size/expand_factor;i++){
-        if(table[i]!= nullptr) {
+    table_length=table_length*expand_factor;
+    for(int i=0;i<table_length/expand_factor;i++){
             int size;
-            T* table_array;
-            table[i]->ToArray(table_array,&size);
-            for(int i=0;i<size;i++){
-                new_table[h(table_array[i])]->Add(table_array[i]);
+            for(typename List<T>::Iterator it=table[i]->begin();it!=table[i]->end();it++){
+                new_table[h(*it)]->insert(*it);
             }
-            delete[](table_array);
             delete(table[i]);
-        }
     }
     delete[] table;
     table=new_table;
 }
 template<class T>
-HashTable::HashTable(int initial_size, int expand_factor) : max_size(initial_size),
+HashTable<T>::HashTable(int initial_size, int expand_factor) : table_length(initial_size),
                                                             expand_factor(expand_factor),
-                                                            current_size(0),
-                                                            table(new AVLTree<T>*[initial_size]){
+                                                            num_elements(0),
+                                                            table(new List<T>*[initial_size]){
     for (int i = 0; i < initial_size; ++i) {
-        table[i] = nullptr;
+        table[i] = new List<T>();
     }
 }
 
 template <class T>
-void HashTable::insert(const T &x) {
-    int position=h(x);
-    if(table[position] == nullptr){
-        table[position]=new AVLTree<T>(x);
+void HashTable<T>::insert(const T &x) {
+    if(num_elements>table_length){
+        expand();
     }
-    if(table[position]->Add(x)==false){
+    int position=h(x);
+    try{
+        find(x);
+    }catch(const ElementDoesntExist& e){
+        table[position]->insert(x);
+        num_elements++;
+        return;
+    }
         throw ElementAlreadyExists();
-    }
 }
 
 template <class T>
-void HashTable::deleteElement(const T &x) {
+void HashTable<T>::deleteElement(const T &x) {
     int position=h(x);
-    if(table[position]== nullptr){
-        throw ElementDoesntExist();
-    }
-    if(table[position]->Remove(x)== false){
-        throw ElementDoesntExist();
-    }
+    typename List<T>::Iterator it=find(x);
+    table[position]->remove(it);
 }
 
 template <class T>
-bool HashTable::member(const T &x) {
+bool HashTable<T>::member(const T &x) {
     int position=h(x);
-    if(table[position] == nullptr){
+    try {
+        typename List<T>::Iterator it = find(x);
+    }catch(const ElementDoesntExist& e){
         return false;
     }
-    if(table[position]->find())
+    return true;
+}
+template <class T>
+typename List<T>::Iterator HashTable<T>::find(const T &x) {
+    int position=h(x);
+    typename List<T>::Iterator result = table[position]->find(x);
+    return result;
 }
 
 #endif //HASHTABLE_HASHTABLE_H
