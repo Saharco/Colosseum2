@@ -9,6 +9,7 @@
 class GladiatorGroup {
     const int id;
 //    ScoresTree scores;
+    bool is_defeated;
 public:
     GladiatorGroup(const int id);
     GladiatorGroup(const GladiatorGroup& g);

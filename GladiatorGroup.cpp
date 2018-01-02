@@ -5,12 +5,12 @@
 #include "GladiatorGroup.h"
 
 
-GladiatorGroup::GladiatorGroup(const int id) : id(id) {
+GladiatorGroup::GladiatorGroup(const int id) : id(id), is_defeated(false) {
     //create tree!
 }
-GladiatorGroup::GladiatorGroup(const GladiatorGroup& g) : id(g.id) {
-
-} //maybe delete this
+GladiatorGroup::GladiatorGroup(const GladiatorGroup& g) : id(g.id), is_defeated(is_defeated) {
+    //Tree?
+}
 GladiatorGroup::~GladiatorGroup() {
     //delete tree!
 }

@@ -13,21 +13,32 @@ class AVLTree;
 
 template<typename T>
 class NodeAVL {
+protected:
     friend class AVLTree<T>; //Allow the tree class to access the nodes' fields
 
     T data; //The node's data. Assumption: overloads comparision operators.
     int BF; //The node's balance factor.
     NodeAVL<T> *left; //Pointer to the node's left son.
     NodeAVL<T> *right; //Pointer to the node's right son.
+    int rank;
+    T smaller_sum;
 
-    NodeAVL(T &data, int BF = 0, NodeAVL<T> *left = NULL,
-            NodeAVL<T> *right = NULL) :
-            data(data), BF(BF), left(left), right(right) {}
+    NodeAVL(T &data = NULL, int BF = 0, NodeAVL<T> *left = NULL,
+            NodeAVL<T> *right = NULL) : data(data), BF(BF), left(left),
+                                        right(right), rank(0),
+                                        smaller_sum(data) {}
 };
 
+
+/*
+ * The AVLTree class - a generic AVL tree that supports the rank feature (rank tree).
+ * We make an ASSUMPTION on the type of values stored in the tree, T: this type overloaded the following operations:
+ * - Comparision (==, <, >, ...).
+ * - Sum (+).
+ */
 template<typename T>
 class AVLTree {
-protected:
+private:
     NodeAVL<T> *root; //The tree contains only one field: a pointer to its root node.
 
     void Delete(NodeAVL<T> *&curr) {
@@ -86,6 +97,7 @@ protected:
 
     bool DecBF(NodeAVL<T> *&curr) {
         curr->BF--;
+        curr->rank++;
         if (curr->BF == 0)
             return false;
         if (curr->BF == -1)
@@ -112,9 +124,20 @@ protected:
             return Insert(data, curr->right) && IncBF(curr);
         } else if (data < curr->data) {
             return Insert(data, curr->left) && DecBF(curr);
-        }
-        else {
+        } else {
             throw ElementAlreadyExists();
+        }
+    }
+
+    T &Find(T data, NodeAVL<T> *&curr) {
+        if (!curr || !curr->data) {
+            throw ElementDoesntExist();
+        } else if (data > curr->data) {
+            return Find(data, curr->right);
+        } else if (data < curr->data) {
+            return Find(data, curr->left);
+        } else {
+            return curr->data;
         }
     }
 
@@ -150,6 +173,20 @@ protected:
         }
     }
 
+    T SmallerSumByRank(int desired_rank, NodeAVL<T> *&curr) {
+        if (!curr) {
+            throw ElementDoesntExist();
+        }
+        int left_rank = curr->left->rank;
+        if (desired_rank == curr->rank) {
+            return curr->smaller_sum;
+        } else if (desired_rank < left_rank) {
+            return SmallerSumByRank(desired_rank, curr->left);
+        } else {
+            return SmallerSumByRank(desired_rank, curr->right);
+        }
+    }
+
     T Max(const NodeAVL<T> *const curr) {
         return (!curr->right) ? curr->data : Max(curr->right);
     }
@@ -176,6 +213,15 @@ protected:
         PreOrder(curr->right);
     }
 
+    void InorderRanks(NodeAVL<T> *&curr) const {
+        if (!this || !curr) {
+            return;
+        }
+        InOrder(curr->left);
+        std::cout << curr->data << ": " << curr->rank << std::endl;
+        InOrder(curr->right);
+    }
+
 public:
     AVLTree(T data_root = NULL) : root(new NodeAVL<T>(data_root)) {}
 
@@ -189,9 +235,19 @@ public:
         Insert(data, root);
     }
 
+    T &Find(T data) {
+        //Wrapper for "Find" function
+        return Find(data, root);
+    }
+
     void Remove(T data) {
         //Wrapper for "Remove" function
         Remove(data, root);
+    }
+
+    T SmallerSumByRank(int desired_rank) {
+        //Wrapper for "SmallerSumByRank" function
+        return SmallerSumByRank(desired_rank, root);
     }
 
     void InOrder() {
@@ -202,6 +258,10 @@ public:
     void PreOrder() {
         //Wrapper for "PreOrder" function (kept for debugging purposes)
         PreOrder(root);
+    }
+
+    void InorderRanks() {
+        InorderRanks(root);
     }
 };
 
