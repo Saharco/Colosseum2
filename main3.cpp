@@ -32,6 +32,8 @@ int main() {
         tree->Insert(950);
 
     } catch (...) {
+        std::cout<<"stam shit"<<std::endl;
     }
     tree->PreorderRanks();
+    delete(tree);
 }

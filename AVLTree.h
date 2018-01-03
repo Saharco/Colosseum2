@@ -155,6 +155,10 @@ private:
     }
 
     bool Insert(T data, NodeAVL<T> *&curr) {
+        if(!root){
+            root = new NodeAVL<T>(data);
+            return true;
+        }
         if (!curr) {
             curr = new NodeAVL<T>(data);
             return true;
@@ -271,7 +275,7 @@ private:
     }
 
     void PreorderRanks(NodeAVL<T> *&curr) const {
-        if (!this || !curr) {
+        if (!curr) {
             return;
         }
         std::cout << curr->data << ": " << curr->rank << ", " << curr->sum
@@ -281,7 +285,8 @@ private:
     }
 
 public:
-    AVLTree(T data_root = NULL) : root(new NodeAVL<T>(data_root)) {}
+    AVLTree() : root(NULL) {}
+    AVLTree(T data_root) : root(new NodeAVL<T>(data_root)) {}
 
     ~AVLTree() {
         //Wrapper for "Delete" function
