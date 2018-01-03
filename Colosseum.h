@@ -14,7 +14,8 @@
 class Colosseum {
     AVLTree<int>* gladiators;
     HashTable<GladiatorGroup*>* groups_table;
-    MinHeap<GladiatorGroup**>* undefeated_groups;
+    MinHeap<GladiatorGroup*>* undefeated_groups;
+
 public:
     Colosseum(int n, int* trainingGroupsIDs);
     ~Colosseum();

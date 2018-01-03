@@ -7,12 +7,7 @@ const int DEFAULT_SIZE = 10;
 const int DEFAULT_EXPAND_FACTOR = 3;
 template<class T>
 class KeyCalculator {
-protected:
-    int table_length;
 public:
-    KeyCalculator<T>(int table_length){
-        this->table_length=table_length;
-    }
     virtual int operator()(const T &element)=0;
 };
 
@@ -31,7 +26,7 @@ class HashTable {
 
 public:
     HashTable(KeyCalculator<T> *keyCalculator,int initial_size=DEFAULT_SIZE, int expand_factor=DEFAULT_EXPAND_FACTOR);
-
+    HashTable(KeyCalculator<T> *keyCalculator,T* array,int initial_size,int expand_factor=DEFAULT_EXPAND_FACTOR);
     ~HashTable();
 
     void insert(const T &x);
@@ -43,7 +38,7 @@ public:
 
 template<class T>
 int HashTable<T>::h(const T &x) {
-    return (*kc)(x);
+    return ((*kc)(x))%table_length;
 }
 
 template<class T>
@@ -66,14 +61,27 @@ void HashTable<T>::expand() {
 
 template<class T>
 HashTable<T>::HashTable(KeyCalculator<T> *keyCalculator,int initial_size, int expand_factor) : table_length(initial_size),
-                                                                                               expand_factor(
-                                                                                                       expand_factor),
+                                                                                               expand_factor(expand_factor),
                                                                                                num_elements(0),
                                                                                                table(new List<T> *[initial_size]),
                                                                                                kc(keyCalculator) {
     for (int i = 0; i < initial_size; ++i) {
         table[i] = new List<T>();
     }
+}
+template<class T>
+HashTable<T>::HashTable(KeyCalculator<T> *keyCalculator, T *array, int initial_size, int expand_factor) : table_length(initial_size),
+                                                                                                       expand_factor(expand_factor),
+                                                                                                       num_elements(0),
+                                                                                                       table(new List<T>*[expand_factor*initial_size]),
+                                                                                                       kc(keyCalculator){
+    for (int i = 0; i < expand_factor*initial_size; ++i) {
+        table[i] = new List<T>();
+    }
+    for(int i = 0;i < initial_size; i++){
+        insert(array[i]);
+    }
+
 }
 template<class T>
 HashTable<T>::~HashTable() {

@@ -17,6 +17,7 @@ public:
 //    void InitID(const int id);
     void InsertScore(const int score);
     int FindBiggest(int k) const;
+    int getId() const;
     bool operator==(const GladiatorGroup& g) const;
     bool operator!=(const GladiatorGroup& g) const;
     bool operator>(const GladiatorGroup& g) const;

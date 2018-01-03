@@ -21,7 +21,7 @@ class MinHeap {
     int size;
     int max_size;
     const int expand_factor;
-    Comparator<T> comparator;
+    Comparator<T> *comparator;
 
     void swap(T &e1, T &e2) {
         T temp(e1);
@@ -32,9 +32,9 @@ class MinHeap {
     void siftDown(int i) {
         int left_child = 2 * i + 1;
         int right_child = 2 * i + 2;
-        int min_child = (comparator(array[left_child], array[right_child]) > 0)
+        int min_child = ((*comparator)(array[left_child], array[right_child]) > 0)
                         ? right_child : left_child;
-        if (comparator(array[i], array[min_child]) > 0) {
+        if ((*comparator)(array[i], array[min_child]) > 0) {
             swap(array[i], array[min_child]);
             siftDown(min_child);
         }
@@ -45,7 +45,7 @@ class MinHeap {
             return; //Reached the root
         }
         int parent_i = (i - 1) / 2;
-        if (comparator(array[parent_i], array[i]) > 0) {
+        if ((*comparator)(array[parent_i], array[i]) > 0) {
             swap(array[i], array[parent_i]);
             siftUp(parent_i);
         }
@@ -71,7 +71,7 @@ class MinHeap {
     }
 
 public:
-    MinHeap(T *elements, int length, Comparator<T> &comparator) :
+    MinHeap(T *elements, int length, Comparator<T> *comparator) :
             comparator(comparator), expand_factor(2), size(length) {
         max_size = size * expand_factor;
         array = new T[max_size];

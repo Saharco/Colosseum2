@@ -18,7 +18,9 @@ GladiatorGroup::~GladiatorGroup() {
 /*void GladiatorGroup::InitID(const int id) {
     this->id = id;
 }*/
-
+int GladiatorGroup::getId() const{
+    return id;
+}
 
 void GladiatorGroup::InsertScore(const int score) {
 //    Might throw exception

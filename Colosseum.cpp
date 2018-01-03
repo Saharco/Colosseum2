@@ -15,7 +15,12 @@ public:
         return 1;
     }
 };
-
+class GladiatorKeyCalculator : public KeyCalculator<GladiatorGroup*>{
+public:
+    int operator()(const GladiatorGroup* &element){
+        return element->getId();
+    };
+};
 Colosseum::Colosseum(int n, int *trainingGroupsIDs) {
     try {
         gladiators = new AVLTree<int>();
@@ -23,9 +28,9 @@ Colosseum::Colosseum(int n, int *trainingGroupsIDs) {
         for(int i = 0; i<n; i++) {
             groups_arr[i] = new GladiatorGroup(trainingGroupsIDs[i]);
         }
-        groups_table->//CONSTRUCTOR WITH AN ARRAY (DOESN'T ALLOCATE)!!!!!!!!
-        ;
-        intComparator cmp;
+        GladiatorKeyCalculator *gkc = new GladiatorKeyCalculator();
+        HashTable<GladiatorGroup*> *new_hash_table = new HashTable<GladiatorGroup*>(gkc);
+        intComparator *cmp = new intComparator();
         undefeated_groups = new MinHeap<GladiatorGroup*>(groups_arr, n, cmp);
         //Hash table de-allocates, heap does not.
     } catch(...) {
