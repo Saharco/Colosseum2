@@ -13,7 +13,6 @@ class AVLTree;
 
 template<typename T>
 class NodeAVL {
-protected:
     friend class AVLTree<T>; //Allow the tree class to access the nodes' fields
 
     T data; //The node's data. Assumption: overloads comparision operators.
@@ -21,12 +20,12 @@ protected:
     NodeAVL<T> *left; //Pointer to the node's left son.
     NodeAVL<T> *right; //Pointer to the node's right son.
     int rank;
-    T smaller_sum;
+    T sum;
 
-    NodeAVL(T &data = NULL, int BF = 0, NodeAVL<T> *left = NULL,
+    NodeAVL(T &data = NULL, int BF = 0, int rank = 1, NodeAVL<T> *left = NULL,
             NodeAVL<T> *right = NULL) : data(data), BF(BF), left(left),
-                                        right(right), rank(0),
-                                        smaller_sum(data) {}
+                                        right(right), rank(rank),
+                                        sum(data) {}
 };
 
 
@@ -58,25 +57,55 @@ private:
         temp2->left = temp1;
         curr = temp2;
         temp1->BF -= 1;
-        if (temp2->BF > 0) temp1->BF -= temp2->BF;
+        if (temp2->BF > 0) {
+            temp1->BF -= temp2->BF;
+        }
         temp2->BF -= 1;
-        if (temp1->BF < 0) temp2->BF += temp1->BF;
+        if (temp1->BF < 0) {
+            temp2->BF += temp1->BF;
+        }
+        int rank1 = (temp1->left) ? temp1->left->rank : 0;
+        int rank2 = (temp1->right) ? temp2->right->rank : 0;
+        int rank3 = (temp2->right) ? temp2->right->rank : 0;
+        temp1->rank = rank1 + rank2 + 1;
+        int rank4 = (temp2->left) ? temp2->left->rank : 0;
+        temp2->rank = rank3 + rank4 + 1;
+
+        int sum1 = (temp1->left) ? temp1->left->sum : 0;
+        int sum2 = (temp1->right) ? temp2->right->sum : 0;
+        temp1->sum = sum1 + sum2 + temp1->data;
+        int sum3 = (temp2->right) ? temp2->right->sum : 0;
+        int sum4 = (temp2->left) ? temp2->left->sum : 0;
+        temp2->sum = sum3 + sum4 + temp2->sum;
     }
 
     void RotateR(NodeAVL<T> *&curr) {
-        NodeAVL<T> *temp1 = curr;
-        NodeAVL<T> *temp2 = curr->left;
-        temp1->left = temp2->right;
-        temp2->right = temp1;
-        curr = temp2;
-        ++(temp1->BF);
-        if (temp2->BF < 0) {
-            temp1->BF -= temp2->BF;
+        NodeAVL<T> *B = curr;
+        NodeAVL<T> *A = curr->left;
+        B->left = A->right;
+        A->right = B;
+        curr = A;
+        ++(B->BF);
+        if (A->BF < 0) {
+            B->BF -= A->BF;
         }
-        temp2->BF += 1;
-        if (temp1->BF > 0) {
-            temp2->BF += temp1->BF;
+        ++(A->BF);
+        if (B->BF > 0) {
+            A->BF += B->BF;
         }
+        int rank1 = (B->left) ? (B->left->rank) : 0;
+        int rank2 = (B->right) ? (B->right->rank) : 0;
+        B->rank = rank1 + rank2 + 1;
+        int rank3 = (A->left) ? (A->left->rank) : 0;
+        int rank4 = (A->right) ? (A->right->rank) : 0;
+        A->rank = rank3 + rank4 + 1;
+
+        int sum1 = (B->left) ? (B->left->sum) : 0;
+        int sum2 = (B->right) ? (B->right->sum) : 0;
+        B->sum = sum1 + sum2 + B->data;
+        int sum3 = (A->left) ? (A->left->sum) : 0;
+        int sum4 = (A->right) ? (A->right->sum) : 0;
+        A->sum = sum3 + sum4 + A->data;
     }
 
     bool IncBF(NodeAVL<T> *&curr) {
@@ -97,7 +126,6 @@ private:
 
     bool DecBF(NodeAVL<T> *&curr) {
         curr->BF--;
-        curr->rank++;
         if (curr->BF == 0)
             return false;
         if (curr->BF == -1)
@@ -112,24 +140,44 @@ private:
         return true;
     }
 
+    void FixRanks(T data, NodeAVL<T> *&curr) {
+        if (!curr) {
+            return;
+        } else if (curr->data > data) {
+            curr->rank--;
+            curr->sum -= data;
+            FixRanks(data, curr->left);
+        } else {
+            curr->rank--;
+            curr->sum -= data;
+            FixRanks(data, curr->right);
+        }
+    }
+
     bool Insert(T data, NodeAVL<T> *&curr) {
         if (!curr) {
             curr = new NodeAVL<T>(data);
             return true;
         } else if (!(curr->data)) {
             curr->data = data;
+            curr->sum = data;
             return true;
         } else if (data > curr->data) {
             //We use this cool trick to traverse back upwards after insertion!!
+            curr->rank++;
+            curr->sum += data;
             return Insert(data, curr->right) && IncBF(curr);
         } else if (data < curr->data) {
+            curr->rank++;
+            curr->sum += data;
             return Insert(data, curr->left) && DecBF(curr);
         } else {
+            FixRanks(data, root);
             throw ElementAlreadyExists();
         }
     }
 
-    T &Find(T data, NodeAVL<T> *&curr) {
+    T &Find(T data, NodeAVL<T> *&curr) const {
         if (!curr || !curr->data) {
             throw ElementDoesntExist();
         } else if (data > curr->data) {
@@ -173,13 +221,13 @@ private:
         }
     }
 
-    T SmallerSumByRank(int desired_rank, NodeAVL<T> *&curr) {
+    T SmallerSumByRank(int desired_rank, NodeAVL<T> *&curr) const {
         if (!curr) {
             throw ElementDoesntExist();
         }
         int left_rank = curr->left->rank;
         if (desired_rank == curr->rank) {
-            return curr->smaller_sum;
+            return curr->sum;
         } else if (desired_rank < left_rank) {
             return SmallerSumByRank(desired_rank, curr->left);
         } else {
@@ -187,11 +235,11 @@ private:
         }
     }
 
-    T Max(const NodeAVL<T> *const curr) {
+    T Max(const NodeAVL<T> *const curr) const {
         return (!curr->right) ? curr->data : Max(curr->right);
     }
 
-    T Min(const NodeAVL<T> *const curr) {
+    T Min(const NodeAVL<T> *const curr) const {
         return (!curr->left) ? curr->data : Min(curr->left);
     }
 
@@ -217,9 +265,19 @@ private:
         if (!this || !curr) {
             return;
         }
-        InOrder(curr->left);
+        InorderRanks(curr->left);
         std::cout << curr->data << ": " << curr->rank << std::endl;
-        InOrder(curr->right);
+        InorderRanks(curr->right);
+    }
+
+    void PreorderRanks(NodeAVL<T> *&curr) const {
+        if (!this || !curr) {
+            return;
+        }
+        std::cout << curr->data << ": " << curr->rank << ", " << curr->sum
+                  << std::endl;
+        PreorderRanks(curr->left);
+        PreorderRanks(curr->right);
     }
 
 public:
@@ -235,7 +293,7 @@ public:
         Insert(data, root);
     }
 
-    T &Find(T data) {
+    T &Find(T data) const {
         //Wrapper for "Find" function
         return Find(data, root);
     }
@@ -245,23 +303,31 @@ public:
         Remove(data, root);
     }
 
-    T SmallerSumByRank(int desired_rank) {
+    T SmallerSumByRank(int desired_rank) const {
         //Wrapper for "SmallerSumByRank" function
-        return SmallerSumByRank(desired_rank, root);
+        int sum = root ? root->sum - desired_rank : -desired_rank;
+        if (sum <= 0) {
+            throw ElementDoesntExist();
+        }
+        return SmallerSumByRank(sum, root);
     }
 
-    void InOrder() {
+    void InOrder() const {
         //Wrapper for "InOrder" function (kept for debugging purposes)
         InOrder(root);
     }
 
-    void PreOrder() {
+    void PreOrder() const {
         //Wrapper for "PreOrder" function (kept for debugging purposes)
         PreOrder(root);
     }
 
-    void InorderRanks() {
+    void InorderRanks() const {
         InorderRanks(root);
+    }
+
+    void PreorderRanks() {
+        PreorderRanks(root);
     }
 };
 

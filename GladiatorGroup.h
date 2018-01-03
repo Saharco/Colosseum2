@@ -8,12 +8,15 @@
 
 class GladiatorGroup {
     const int id;
-//    ScoresTree scores;
+    AVLTree<int>* scores;
     bool is_defeated;
 public:
     GladiatorGroup(const int id);
     GladiatorGroup(const GladiatorGroup& g);
     ~GladiatorGroup();
+//    void InitID(const int id);
+    void InsertScore(const int score);
+    int FindBiggest(int k) const;
     bool operator==(const GladiatorGroup& g) const;
     bool operator!=(const GladiatorGroup& g) const;
     bool operator>(const GladiatorGroup& g) const;
