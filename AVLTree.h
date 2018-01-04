@@ -65,18 +65,18 @@ private:
             temp2->BF += temp1->BF;
         }
         int rank1 = (temp1->left) ? temp1->left->rank : 0;
-        int rank2 = (temp1->right) ? temp2->right->rank : 0;
-        int rank3 = (temp2->right) ? temp2->right->rank : 0;
+        int rank2 = (temp1->right) ? temp1->right->rank : 0;
         temp1->rank = rank1 + rank2 + 1;
+        int rank3 = (temp2->right) ? temp2->right->rank : 0;
         int rank4 = (temp2->left) ? temp2->left->rank : 0;
         temp2->rank = rank3 + rank4 + 1;
 
         int sum1 = (temp1->left) ? temp1->left->sum : 0;
-        int sum2 = (temp1->right) ? temp2->right->sum : 0;
+        int sum2 = (temp1->right) ? temp1->right->sum : 0;
         temp1->sum = sum1 + sum2 + temp1->data;
         int sum3 = (temp2->right) ? temp2->right->sum : 0;
         int sum4 = (temp2->left) ? temp2->left->sum : 0;
-        temp2->sum = sum3 + sum4 + temp2->sum;
+        temp2->sum = sum3 + sum4 + temp2->data;
     }
 
     void RotateR(NodeAVL<T> *&curr) {
