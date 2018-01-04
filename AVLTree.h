@@ -312,7 +312,7 @@ public:
         //Wrapper for "SmallerSumByRank" function
         int sum = root ? root->sum - desired_rank : -desired_rank;
         if (sum <= 0) {
-            throw ElementDoesntExist();
+            throw notEnoughElements();
         }
         return SmallerSumByRank(sum, root);
     }

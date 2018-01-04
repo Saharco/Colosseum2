@@ -21,5 +21,5 @@ class uninitializedColosseumException : public invalidInputException {};
 class badStimulantCodeException : public invalidInputException {};
 class badStimulantFactorException : public invalidInputException {};
 class sameIdException : public failureException {};
-
+class notEnoughElements : public failureException {};
 #endif //COLOSSEUM2_EXCEPTIONS_H

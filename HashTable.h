@@ -34,6 +34,7 @@ public:
     void deleteElement(const T &x);
 
     bool member(const T &x);
+    T findElement(const T& x);
 };
 
 template<class T>
@@ -115,9 +116,8 @@ void HashTable<T>::deleteElement(const T &x) {
 
 template<class T>
 bool HashTable<T>::member(const T &x) {
-    int position = h(x);
     try {
-        typename List<T>::Iterator it = find(x);
+        find(x);
     } catch (const ElementDoesntExist &e) {
         return false;
     }
@@ -129,6 +129,10 @@ typename List<T>::Iterator HashTable<T>::find(const T &x) {
     int position = h(x);
     typename List<T>::Iterator result = table[position]->find(x);
     return result;
+}
+template <class T>
+T HashTable::findElement(const T &x) {
+    return *(find(x));
 }
 
 #endif //HASHTABLE_HASHTABLE_H

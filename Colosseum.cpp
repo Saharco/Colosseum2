@@ -3,63 +3,132 @@
 //
 
 #include "Colosseum.h"
+#include "Exceptions.h"
 
-class intComparator : public Comparator<int> {
-public:
-    intComparator(){};
-    ~intComparator(){};
-    int operator()(int num1, int num2) {
-        int result = num1 - num2;
-        if(result < 0) return -1;
-        else if(result > 0) return 1;
-        return 1;
-    }
-};
-class GladiatorKeyCalculator : public KeyCalculator<GladiatorGroup*>{
-public:
-    int operator()(const GladiatorGroup* &element){
-        return element->getId();
-    };
-};
 Colosseum::Colosseum(int n, int *trainingGroupsIDs) {
-    try {
+    gladiators=NULL;
+    gkc=NULL;
+    groups_table=NULL;
+    cmp=NULL;
+    undefeated_groups=NULL;
         gladiators = new AVLTree<int>();
-        GladiatorGroup** groups_arr = new GladiatorGroup*[n];
+    try {
+        GladiatorGroup **groups_arr = new GladiatorGroup *[n];
         for(int i = 0; i<n; i++) {
             groups_arr[i] = new GladiatorGroup(trainingGroupsIDs[i]);
         }
-        GladiatorKeyCalculator *gkc = new GladiatorKeyCalculator();
-        HashTable<GladiatorGroup*> *new_hash_table = new HashTable<GladiatorGroup*>(gkc);
-        intComparator *cmp = new intComparator();
+        gkc= new GladiatorKeyCalculator();
+        groups_table = new HashTable<GladiatorGroup*>(gkc,n*2);
+        cmp= new intComparator();
         undefeated_groups = new MinHeap<GladiatorGroup*>(groups_arr, n, cmp);
         //Hash table de-allocates, heap does not.
-    } catch(...) {
-        *this = NULL;
+    } catch(const std::bad_alloc& e) {
+        if(!gladiators){
+            delete(gladiators);
+        }
+        if(!gkc){
+            delete(gkc);
+        }
+        if (!groups_table){
+            delete(groups_table);
+        }
+        if(!cmp){
+            delete(cmp);
+        }
+        if(!undefeated_groups){
+            delete(undefeated_groups);
+        }
     }
 }
 
 Colosseum::~Colosseum() {
-
+    delete(gladiators);
+    delete(groups_table);
+    delete(undefeated_groups);
+    delete(gkc);
+    delete(cmp);
 }
 
 StatusType Colosseum::addTrainingGroup(int trainingGroupID) {
-    try {
-
-    } catch (...) {
-
+    if(trainingGroupID<0){
+        return INVALID_INPUT;
     }
+    try {
+        GladiatorGroup* new_group = new GladiatorGroup(trainingGroupID);
+        if(groups_table->member(new_group)){
+            delete(new_group);
+            return FAILURE;
+        }
+        groups_table->insert(new_group);
+        undefeated_groups->insert(new_group);
+    } catch (std::bad_alloc) {
+        return ALLOCATION_ERROR;
+    }
+    return SUCCESS;
 }
 
-StatusType
-Colosseum::addGladiator(int gladiatorID, int score, int trainingGroup) {
-
+StatusType Colosseum::addGladiator(int gladiatorID, int score, int trainingGroup) {
+    if(trainingGroup < 0 || gladiatorID < 0 || score < 0){
+        return INVALID_INPUT;
+    }
+    GladiatorGroup dummy_group(trainingGroup);
+    try{
+        gladiators->Find(gladiatorID);
+        if(!groups_table->member(&dummy_group)){
+            return FAILURE;
+        }
+    }catch(const ElementDoesntExist& e){
+        groups_table->findElement(&dummy_group)->InsertScore(score);
+        gladiators->Insert(gladiatorID);
+        return SUCCESS;
+    }
+    return FAILURE;
 }
 
 StatusType Colosseum::trainingGroupFight(int trainingGroup1,
                                          int trainingGroup2, int k1, int k2) {
+    if(k1 <= 0 || k2 <= 0 || trainingGroup1<0 || trainingGroup2 < 0){
+        return INVALID_INPUT;
+    }
+    GladiatorGroup dummy_1(trainingGroup1);
+    GladiatorGroup dummy_2(trainingGroup2);
+    try{
+        GladiatorGroup* group_1=groups_table->findElement(&dummy_1);
+        GladiatorGroup* group_2=groups_table->findElement(&dummy_2);
+        if(trainingGroup1==trainingGroup2 ||group_1->getDefeatedStatus() || group_2->getDefeatedStatus()){
+            return FAILURE;
+        }
+        int score_1=groups_table->findElement(&dummy_1)->FindBiggest(k1);
+        int score_2=groups_table->findElement(&dummy_2)->FindBiggest(k2);
+        if(score_1 > score_2){
+            group_2->setDefeatedStatus();
+        }
+        else if (score_2 > score_1){
+            group_1->setDefeatedStatus();
+        }
+        else{
+            if (trainingGroup1 > trainingGroup2){
+                group_1->setDefeatedStatus();
+            }
+            else{
+                group_2->setDefeatedStatus();
+            }
+        }
+
+    } catch(const failureException& e){
+        return FAILURE;
+    }
+    while(undefeated_groups->findMin()->getDefeatedStatus()){
+        undefeated_groups->deleteMin();
+    }
+    return SUCCESS;
 
 }
 
 StatusType Colosseum::getMinTrainingGroup(int *trainingGroup) {
-
+    if(!trainingGroup){
+        return INVALID_INPUT;
+    }
+    *trainingGroup = undefeated_groups->findMin()->getId();
+    return SUCCESS;
 }

@@ -50,3 +50,11 @@ bool GladiatorGroup::operator>=(const GladiatorGroup& g) const {
 bool GladiatorGroup::operator<=(const GladiatorGroup& g) const {
     return(this->id <= g.id);
 }
+
+bool GladiatorGroup::getDefeatedStatus() const {
+    return is_defeated;
+}
+
+void GladiatorGroup::setDefeatedStatus() {
+    is_defeated=true;
+}
