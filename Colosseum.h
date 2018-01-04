@@ -10,20 +10,23 @@
 #include "HashTable.h"
 #include "MinHeap.h"
 #include "GladiatorGroup.h"
-class intComparator : public Comparator<int> {
+class GladiatorComparator : public Comparator<GladiatorGroup*> {
 public:
-    intComparator(){};
-    ~intComparator(){};
-    int operator()(int num1, int num2) {
-        int result = num1 - num2;
-        if(result < 0) return -1;
-        else if(result > 0) return 1;
-        return 1;
+    GladiatorComparator(){};
+    ~GladiatorComparator(){};
+    int operator()(GladiatorGroup* g1, GladiatorGroup* g2) {
+        if(g1->getDefeatedStatus()){
+            return -1;
+        }
+        else if(g2->getDefeatedStatus()){
+            return 1;
+        }
+        else return g1->getId()-g2->getId();
     }
 };
 class GladiatorKeyCalculator : public KeyCalculator<GladiatorGroup*>{
 public:
-    int operator()(const GladiatorGroup* &element){
+    int operator()(GladiatorGroup* element) {
         return element->getId();
     };
 };
@@ -32,7 +35,7 @@ class Colosseum {
     HashTable<GladiatorGroup*>* groups_table;
     MinHeap<GladiatorGroup*>* undefeated_groups;
     GladiatorKeyCalculator *gkc;
-    intComparator *cmp;
+    GladiatorComparator *cmp;
 public:
     Colosseum(int n, int* trainingGroupsIDs);
     ~Colosseum();

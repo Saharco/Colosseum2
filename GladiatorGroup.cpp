@@ -8,7 +8,7 @@
 GladiatorGroup::GladiatorGroup(const int id) : id(id), is_defeated(false) {
     scores = new AVLTree<int>();
 }
-GladiatorGroup::GladiatorGroup(const GladiatorGroup& g) : id(g.id), is_defeated(is_defeated) {
+GladiatorGroup::GladiatorGroup(const GladiatorGroup& g) : id(g.id), is_defeated(g.is_defeated) {
     //Tree?
 }
 GladiatorGroup::~GladiatorGroup() {
@@ -29,7 +29,7 @@ void GladiatorGroup::InsertScore(const int score) {
 
 int GladiatorGroup::FindBiggest(int k) const {
 //    Might throw exception
-    return scores->SmallerSumByRank(k);
+    return scores->PartialSumByOrder(k);
 }
 
 bool GladiatorGroup::operator==(const GladiatorGroup& g) const {

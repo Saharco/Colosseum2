@@ -30,8 +30,8 @@ class MinHeap {
     }
 
     void siftDown(int i) {
-        int left_child = 2 * i + 1;
-        int right_child = 2 * i + 2;
+        int left_child = (2 * i + 1 < size) ? (2 * i + 1) : i;
+        int right_child = (2 * i + 2 < size) ? (2 * i + 2) : i;
         int min_child = ((*comparator)(array[left_child], array[right_child]) > 0)
                         ? right_child : left_child;
         if ((*comparator)(array[i], array[min_child]) > 0) {

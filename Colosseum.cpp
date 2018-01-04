@@ -11,15 +11,15 @@ Colosseum::Colosseum(int n, int *trainingGroupsIDs) {
     groups_table=NULL;
     cmp=NULL;
     undefeated_groups=NULL;
-        gladiators = new AVLTree<int>();
+    gladiators = new AVLTree<int>();
     try {
         GladiatorGroup **groups_arr = new GladiatorGroup *[n];
         for(int i = 0; i<n; i++) {
             groups_arr[i] = new GladiatorGroup(trainingGroupsIDs[i]);
         }
         gkc= new GladiatorKeyCalculator();
-        groups_table = new HashTable<GladiatorGroup*>(gkc,n*2);
-        cmp= new intComparator();
+        groups_table = new HashTable<GladiatorGroup*>(gkc,groups_arr,n,3);
+        cmp= new GladiatorComparator();
         undefeated_groups = new MinHeap<GladiatorGroup*>(groups_arr, n, cmp);
         //Hash table de-allocates, heap does not.
     } catch(const std::bad_alloc& e) {
@@ -78,9 +78,13 @@ StatusType Colosseum::addGladiator(int gladiatorID, int score, int trainingGroup
             return FAILURE;
         }
     }catch(const ElementDoesntExist& e){
-        groups_table->findElement(&dummy_group)->InsertScore(score);
-        gladiators->Insert(gladiatorID);
-        return SUCCESS;
+        try {
+            groups_table->findElement(&dummy_group)->InsertScore(score);
+            gladiators->Insert(gladiatorID);
+            return SUCCESS;
+        }catch(const failureException& e) {
+            return FAILURE;
+        }
     }
     return FAILURE;
 }

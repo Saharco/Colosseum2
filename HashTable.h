@@ -8,17 +8,17 @@ const int DEFAULT_EXPAND_FACTOR = 3;
 template<class T>
 class KeyCalculator {
 public:
-    virtual int operator()(const T &element)=0;
+    virtual ~KeyCalculator(){}
+    virtual int operator()(T element)=0;
 };
 
 template<class T>
 class HashTable {
-    List<T> **table;
     int table_length;
-    int num_elements;
     int expand_factor;
+    int num_elements;
+    List<T> **table;
     KeyCalculator<T> *kc;
-
     int h(const T &x);          //NEED CHANGES
     void expand();
 
@@ -50,7 +50,6 @@ void HashTable<T>::expand() {
     }
     table_length = table_length * expand_factor;
     for (int i = 0; i < table_length / expand_factor; i++) {
-        int size;
         for (typename List<T>::Iterator it = table[i]->begin(); it != table[i]->end(); it++) {
             new_table[h(*it)]->insert(*it);
         }
@@ -131,7 +130,7 @@ typename List<T>::Iterator HashTable<T>::find(const T &x) {
     return result;
 }
 template <class T>
-T HashTable::findElement(const T &x) {
+T HashTable<T>::findElement(const T &x) {
     return *(find(x));
 }
 

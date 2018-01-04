@@ -20,9 +20,9 @@ class List {
             previous = NULL;
         }
 
-        Node(T data, Node *next, Node *previous) : next(next),
-                                                   previous(previous),
-                                                   data(data) {}
+        Node(T data, Node *next, Node *previous) : data(data),
+                                                   next(next),
+                                                   previous(previous) {}
 
         bool operator==(const Node &node) const {
             return (next == node.next && previous == node.previous &&
@@ -229,7 +229,7 @@ public:
 
     Iterator find(const T& x) {
         for (Iterator i = (*this).begin(); i != (*this).end(); i++) {
-            if (i.operator*() == x) {
+            if (*(i.operator*()) == *x) {
                 return i;
             }
         }

@@ -181,7 +181,7 @@ private:
         }
     }
 
-    T &Find(T data, NodeAVL<T> *&curr) const {
+    T &Find(T data, NodeAVL<T> *curr) const {
         if (!curr || !curr->data) {
             throw ElementDoesntExist();
         } else if (data > curr->data) {
