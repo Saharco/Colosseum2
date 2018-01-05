@@ -21,6 +21,7 @@ Colosseum::Colosseum(int n, int *trainingGroupsIDs) {
         groups_table = new HashTable<GladiatorGroup*>(gkc,groups_arr,n,3);
         cmp= new GladiatorComparator();
         undefeated_groups = new MinHeap<GladiatorGroup*>(groups_arr, n, cmp);
+        delete[] (groups_arr);
         //Hash table de-allocates, heap does not.
     } catch(const std::bad_alloc& e) {
         if(!gladiators){

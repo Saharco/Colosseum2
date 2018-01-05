@@ -70,11 +70,11 @@ HashTable<T>::HashTable(KeyCalculator<T> *keyCalculator,int initial_size, int ex
     }
 }
 template<class T>
-HashTable<T>::HashTable(KeyCalculator<T> *keyCalculator, T *array, int initial_size, int expand_factor) : table_length(initial_size),
-                                                                                                       expand_factor(expand_factor),
-                                                                                                       num_elements(0),
-                                                                                                       table(new List<T>*[expand_factor*initial_size]),
-                                                                                                       kc(keyCalculator){
+HashTable<T>::HashTable(KeyCalculator<T> *keyCalculator, T *array, int initial_size, int expand_factor) : table_length(initial_size*expand_factor),
+                                                                                                          expand_factor(expand_factor),
+                                                                                                          num_elements(0),
+                                                                                                          table(new List<T>*[expand_factor*initial_size]),
+                                                                                                          kc(keyCalculator){
     for (int i = 0; i < expand_factor*initial_size; ++i) {
         table[i] = new List<T>();
     }
