@@ -33,4 +33,29 @@ int main() {
     std::cout << tree1->PartialSumByOrder(2) << std::endl; //380
     std::cout << tree2->PartialSumByOrder(14) << std::endl; //1428
     std::cout << tree1->PartialSumByOrder(5) << std::endl; //800
+    std::cout << std::endl << "-------"  << std::endl;
+    try {
+        tree1->Insert(180);
+    } catch(...) {
+        tree1->PreorderRanks();
+        std::cout << std::endl << "-------"  << std::endl;
+    }
+    try {
+        tree1->Insert(150);
+    } catch(...) {
+        tree1->PreorderRanks();
+        std::cout << std::endl << "-------"  << std::endl;
+    }
+    try {
+        tree1->Insert(50);
+    } catch(...) {
+        tree1->PreorderRanks();
+        std::cout << std::endl << "-------"  << std::endl;
+    }
+    try {
+        tree1->Remove(195);
+    } catch(...) {
+        tree1->PreorderRanks();
+        std::cout << std::endl << "-------"  << std::endl;
+    }
 }

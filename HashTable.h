@@ -48,14 +48,14 @@ void HashTable<T>::expand() {
     for (int i = 0; i < table_length * expand_factor; i++) {
         new_table[i] = new List<T>();
     }
-    table_length = table_length * expand_factor;
-    for (int i = 0; i < table_length / expand_factor; i++) {
+    for (int i = 0; i < table_length; i++) {
         for (typename List<T>::Iterator it = table[i]->begin(); it != table[i]->end(); it++) {
             new_table[h(*it)]->insert(*it);
         }
         delete (table[i]);
     }
     delete[] table;
+    table_length = table_length * expand_factor;
     table = new_table;
 }
 

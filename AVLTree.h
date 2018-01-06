@@ -15,17 +15,16 @@ template<typename T>
 class NodeAVL {
     friend class AVLTree<T>; //Allow the tree class to access the nodes' fields
 
-    T data; //The node's data. Assumption: overloads comparision operators.
+    T data; //The node's data. Assumption: overloads comparision and addition operators.
     int BF; //The node's balance factor.
     NodeAVL<T> *left; //Pointer to the node's left son.
     NodeAVL<T> *right; //Pointer to the node's right son.
-    int size;
-    T sum;
+    int size; //Amount of nodes in the sub-tree where this node is its root
+    T sum; //Sum of nodes' data in the sub-tree where this node is its root
 
     NodeAVL(T &data = NULL, int BF = 0, int size = 1, NodeAVL<T> *left = NULL,
             NodeAVL<T> *right = NULL) : data(data), BF(BF), left(left),
-                                        right(right), size(size),
-                                        sum(data) {}
+                                        right(right), size(size), sum(data) {}
 };
 
 
@@ -140,18 +139,11 @@ private:
         return true;
     }
 
-    void FixRanks(T data, NodeAVL<T> *&curr) {
-        if (!curr) {
-            return;
-        } else if (curr->data > data) {
-            curr->size--;
-            curr->sum -= data;
-            FixRanks(data, curr->left);
-        } else {
-            curr->size--;
-            curr->sum -= data;
-            FixRanks(data, curr->right);
-        }
+    void FixRanks(T data, NodeAVL<T> *&curr, bool to_add) {
+        if (!curr || curr->data == data) return;
+        curr->size-= (to_add) ? 1 : -1;
+        curr->sum -= (to_add) ? data : -data;
+        FixRanks(data, (curr->data > data) ? (curr->left) : (curr->right), to_add);
     }
 
     bool Insert(T data, NodeAVL<T> *&curr) {
@@ -176,7 +168,7 @@ private:
             curr->sum += data;
             return Insert(data, curr->left) && DecBF(curr);
         } else {
-            FixRanks(data, root);
+            FixRanks(data, root, true);
             throw ElementAlreadyExists();
         }
     }
@@ -195,10 +187,15 @@ private:
 
     bool Remove(T data, NodeAVL<T> *&curr) {
         if (!curr || !curr->data || !data) {
+            FixRanks(data, root, false);
             throw ElementDoesntExist();
         } else if (curr->data > data) {
+            curr->size--;
+            curr->sum -= data;
             return Remove(data, curr->left) && IncBF(curr);
         } else if (curr->data < data) {
+            curr->size--;
+            curr->sum -= data;
             return Remove(data, curr->right) && DecBF(curr);
         } else {
             if (!curr->left && !curr->right) {
@@ -210,16 +207,15 @@ private:
                 current_node->data = min_node_value;
                 return isDiffHeight;
             } else {
-                NodeAVL<T> *node_to_remove = curr;
-
+                NodeAVL<T>* to_remove = curr;
                 if (!curr->left) {
-                    curr = node_to_remove->right;
-                    node_to_remove->right = NULL;
+                    curr = to_remove->right;
+                    to_remove->right = NULL;
                 } else {
-                    curr = node_to_remove->left;
-                    node_to_remove->left = NULL;
+                    curr = to_remove->left;
+                    to_remove->left = NULL;
                 }
-                Delete(node_to_remove);
+                Delete(to_remove);
             }
             return true;
         }
@@ -231,7 +227,7 @@ private:
         } else if (curr->size == order) {
             return curr->sum;
         } else if (curr->right->size + 1 == order) {
-                return curr->right->sum + curr->data;
+            return curr->right->sum + curr->data;
         } else if (curr->right->size < order) {
             return curr->right->sum + curr->data +
                    PartialSumByOrder(order - curr->right->size - 1, curr->left);

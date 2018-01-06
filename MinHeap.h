@@ -115,15 +115,6 @@ public:
         deleteMin();
         siftDown(0);
     }
-
-    /*
-     * Delet dis
-     */
-    void printArray() {
-        for (int i = 0; i < size; i++) {
-            std::cout << array[i] << std::endl;
-        }
-    }
 };
 
 

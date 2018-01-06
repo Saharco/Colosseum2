@@ -119,7 +119,6 @@ StatusType Colosseum::trainingGroupFight(int trainingGroup1,
                 group_2->setDefeatedStatus();
             }
         }
-
     } catch(const failureException& e){
         return FAILURE;
     }
@@ -127,7 +126,6 @@ StatusType Colosseum::trainingGroupFight(int trainingGroup1,
         undefeated_groups->deleteMin();
     }
     return SUCCESS;
-
 }
 
 StatusType Colosseum::getMinTrainingGroup(int *trainingGroup) {
