@@ -114,7 +114,7 @@ private:
         if (curr->BF == 1)
             return true;
         if (curr->BF == 2) {
-            if (curr->right->BF == -1) {
+            if (curr->right && curr->right->BF == -1) {
                 RotateR(curr->right);
             }
             RotateL(curr);
@@ -130,7 +130,7 @@ private:
         if (curr->BF == -1)
             return true;
         if (curr->BF == -2) {
-            if (curr->left->BF == 1) {
+            if (curr->left && curr->left->BF == 1) {
                 RotateL(curr->left);
             }
             RotateR(curr);
@@ -226,6 +226,8 @@ private:
             throw ElementDoesntExist();
         } else if (curr->size == order) {
             return curr->sum;
+        } else if (!curr->right) {
+            return PartialSumByOrder(order, curr->left);
         } else if (curr->right->size + 1 == order) {
             return curr->right->sum + curr->data;
         } else if (curr->right->size < order) {
@@ -267,7 +269,8 @@ private:
             return;
         }
         InorderRanks(curr->left);
-        std::cout << curr->data << ": " << curr->size << std::endl;
+        std::cout << curr->data << ": " << curr->size << ", " << curr->sum
+                  << std::endl;
         InorderRanks(curr->right);
     }
 
@@ -291,43 +294,88 @@ public:
         Delete(root);
     }
 
+    /*
+     *  ---------------------------
+     * |Interface of the AVL tree: |
+     *  ---------------------------
+     */
+
+    /*
+     * Gets an element and inserts it to the tree.
+     * Throws exception if the key already exists.
+     */
     void Insert(T data) {
         //Wrapper for "Insert" function
         Insert(data, root);
     }
 
+    /*
+     * Gets a key and finds it in the tree. If it exists - return its data.
+     * Otherwise throws an exception.
+     */
     T &Find(T data) const {
         //Wrapper for "Find" function
         return Find(data, root);
     }
 
+    /*
+     * Gets a key and deletes it from the tree, if it exists.
+     * Otherwise throws exception.
+     */
     void Remove(T data) {
         //Wrapper for "Remove" function
         Remove(data, root);
     }
 
+    /*
+     * Gets the desired amount of the largest elements in the tree, and returns
+     * the sum of that amount of elements in the tree. If the tree doesn't contain
+     * enough elements, or when the desired amount is not a positive number.
+     */
     T PartialSumByOrder(int order) {
         //Wrapper for "SmallerSumByRank" function
-        if (!root || root->size < order) {
+        if (order <= 0 || !root || root->size < order) {
             throw notEnoughElements();
         }
         return PartialSumByOrder(order, root);
     }
 
+    /*
+     * Returns the size of the tree (amount of elements in the whole tree)
+     */
+    int Size() const {
+        return (root) ? root->size : 0;
+    }
+
+
+    //---The following functions are traversals on the tree, kept for debugging purposes:
+
+    /*
+     * Standard InOrder traversal
+     */
     void InOrder() const {
         //Wrapper for "InOrder" function (kept for debugging purposes)
         InOrder(root);
     }
 
+    /*
+     * Standard PreOrder traversal
+     */
     void PreOrder() const {
         //Wrapper for "PreOrder" function (kept for debugging purposes)
         PreOrder(root);
     }
 
-    void InorderRanks() const {
+    /*
+     * InOrder traversal that also prints the ranks
+     */
+    void InorderRanks() {
         InorderRanks(root);
     }
 
+    /*
+     * PreOrder traversal that also prints the ranks
+     */
     void PreorderRanks() {
         PreorderRanks(root);
     }

@@ -1,42 +1,22 @@
 #include <iostream>
 #include "AVLTree.h"
+#include <cstdlib>
 
-/*class intComparator : public Comparator<int> {
-public:
-    intComparator(){};
-    ~intComparator(){};
-    int operator()(int num1, int num2) {
-        int result = num1 - num2;
-        if(result < 0) return -1;
-        else if(result > 0) return 1;
-        return 1;
-    }
-};*/
+const int TEST_SIZE = 1000;
+const int MAX_KEY = 20000;
 
 int main() {
-    AVLTree<int>* tree = new AVLTree<int>();
-    tree->Insert(10);
-    tree->Insert(5);
-    tree->Insert(2);
-    tree->Insert(15);
-    tree->Insert(43);
-    tree->Insert(12);
-    tree->Insert(1);
-    tree->Insert(40);
-    tree->Insert(22);
-    tree->Insert(27);
-    tree->Insert(50);
-    tree->Insert(13);
-    tree->Insert(14);
-    tree->Insert(20);
-    tree->Insert(60);
-    tree->Insert(7);
-    tree->Insert(8);
-    tree->PreOrder();
-    std::cout << std::endl;
-    tree->Remove(40);
-    tree->Remove(27);
-    tree->Remove(22);
-    tree->Remove(5);
-    tree->PreOrder();
+    AVLTree<int> *tree = new AVLTree<int>();
+    int i = 0, key = 0;
+    GENERATE: try {
+        for (; i < TEST_SIZE; i++) {
+            key = rand() % (MAX_KEY + 1);
+            tree->Insert(key);
+        }
+    } catch(const ElementAlreadyExists& e) {
+        goto GENERATE;
+    }
+    tree->InorderRanks();
+//    tree->PreorderRanks();
+    std::cout << std::endl << tree->PartialSumByOrder(5) << std::endl;
 }
