@@ -19,4 +19,5 @@ int main() {
     tree->InorderRanks();
 //    tree->PreorderRanks();
     std::cout << std::endl << tree->PartialSumByOrder(5) << std::endl;
+    delete(tree);
 }

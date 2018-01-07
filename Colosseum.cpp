@@ -7,13 +7,14 @@
 
 Colosseum::Colosseum(int n, int *trainingGroupsIDs) {
     gladiators=NULL;
+    GladiatorGroup** groups_arr=NULL;
     gkc=NULL;
     groups_table=NULL;
     cmp=NULL;
     undefeated_groups=NULL;
     gladiators = new AVLTree<int>();
     try {
-        GladiatorGroup **groups_arr = new GladiatorGroup *[n];
+        groups_arr = new GladiatorGroup *[n];
         for(int i = 0; i<n; i++) {
             groups_arr[i] = new GladiatorGroup(trainingGroupsIDs[i]);
         }
@@ -24,19 +25,27 @@ Colosseum::Colosseum(int n, int *trainingGroupsIDs) {
         delete[] (groups_arr);
         //Hash table de-allocates, heap does not.
     } catch(const std::bad_alloc& e) {
-        if(!gladiators){
+        if(gladiators){
             delete(gladiators);
         }
-        if(!gkc){
+        if(groups_arr) {
+            for(int i = 0; i<n ;i++) {
+                if(groups_arr[i]) {
+                    delete(groups_arr[i]);
+                }
+            }
+            delete(groups_arr);
+        }
+        if(gkc){
             delete(gkc);
         }
-        if (!groups_table){
+        if(groups_table){
             delete(groups_table);
         }
-        if(!cmp){
+        if(cmp){
             delete(cmp);
         }
-        if(!undefeated_groups){
+        if(undefeated_groups){
             delete(undefeated_groups);
         }
     }

@@ -39,9 +39,9 @@ class AVLTree {
 private:
     NodeAVL<T> *root; //The tree contains only one field: a pointer to its root node.
 
-    void Delete(NodeAVL<T> *&curr) {
+    void Delete(NodeAVL<T> * curr) {
         //De-allocates all of the tree's nodes, starting from the given node (root)
-        if (curr) {
+        if(curr) {
             Delete(curr->left);
             Delete(curr->right);
             delete curr;
@@ -292,7 +292,7 @@ public:
     ~AVLTree() {
         //Wrapper for "Delete" function
         Delete(root);
-        delete(root);
+        if(root) delete(root);
         root = NULL;
     }
 

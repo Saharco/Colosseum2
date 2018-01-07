@@ -39,7 +39,7 @@ public:
 
 template<class T>
 int HashTable<T>::h(const T &x) {
-    return ((*kc)(x))%table_length;
+    return (kc->operator()(x))%table_length;
 }
 
 template<class T>
@@ -49,7 +49,7 @@ void HashTable<T>::expand() {
         new_table[i] = new List<T>();
     }
     table_length = table_length * expand_factor;
-    for (int i = 0; i < table_length / expand_factor; i++) {
+    for (int i = 0; i < (table_length / expand_factor); i++) {
         for (typename List<T>::Iterator it = table[i]->begin(); it != table[i]->end(); it++) {
             new_table[h(*it)]->insert(*it);
         }
