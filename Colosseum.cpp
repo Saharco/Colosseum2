@@ -44,8 +44,8 @@ Colosseum::Colosseum(int n, int *trainingGroupsIDs) {
 
 Colosseum::~Colosseum() {
     delete(gladiators);
-    delete(groups_table);
     delete(undefeated_groups);
+    delete(groups_table);
     delete(gkc);
     delete(cmp);
 }
