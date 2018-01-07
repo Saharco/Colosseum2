@@ -292,7 +292,6 @@ public:
     ~AVLTree() {
         //Wrapper for "Delete" function
         Delete(root);
-        if(root) delete(root);
         root = NULL;
     }
 
