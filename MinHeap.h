@@ -72,7 +72,7 @@ class MinHeap {
 
 public:
     MinHeap(T *elements, int length, Comparator<T> *comparator) :
-            comparator(comparator), expand_factor(2), size(length) {
+            size(length),expand_factor(2),comparator(comparator) {
         max_size = size * expand_factor;
         array = new T[max_size];
         for (int i = 0; i < length; i++) {
