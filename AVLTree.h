@@ -39,9 +39,9 @@ class AVLTree {
 private:
     NodeAVL<T> *root; //The tree contains only one field: a pointer to its root node.
 
-    void Delete(NodeAVL<T> * curr) {
+    void Delete(NodeAVL<T> *curr) {
         //De-allocates all of the tree's nodes, starting from the given node (root)
-        if(curr) {
+        if (curr) {
             Delete(curr->left);
             Delete(curr->right);
             delete curr;
@@ -141,9 +141,10 @@ private:
 
     void FixRanks(T data, NodeAVL<T> *&curr, bool to_add) {
         if (!curr || curr->data == data) return;
-        curr->size-= (to_add) ? 1 : -1;
+        curr->size -= (to_add) ? 1 : -1;
         curr->sum -= (to_add) ? data : -data;
-        FixRanks(data, (curr->data > data) ? (curr->left) : (curr->right), to_add);
+        FixRanks(data, (curr->data > data) ? (curr->left) : (curr->right),
+                 to_add);
     }
 
     bool Insert(T data, NodeAVL<T> *&curr) {
@@ -154,35 +155,36 @@ private:
         if (!curr) {
             curr = new NodeAVL<T>(data);
             return true;
-        } else if (!(curr->data)) {
-            curr->data = data;
-            curr->sum = data;
-            return true;
-        } else if (data > curr->data) {
+        } else if (data >= curr->data) {
             //We use this cool trick to traverse back upwards after insertion!!
             curr->size++;
             curr->sum += data;
             return Insert(data, curr->right) && IncBF(curr);
-        } else if (data < curr->data) {
+        } else {
             curr->size++;
             curr->sum += data;
             return Insert(data, curr->left) && DecBF(curr);
-        } else {
+        } /*else {
             FixRanks(data, root, true);
             throw ElementAlreadyExists();
-        }
+        }*/
     }
 
-    T &Find(T data, NodeAVL<T> *curr) const {
-        if (!curr || !curr->data) {
-            throw ElementDoesntExist();
-        } else if (data > curr->data) {
-            return Find(data, curr->right);
-        } else if (data < curr->data) {
-            return Find(data, curr->left);
-        } else {
-            return curr->data;
+    bool Find(T data, NodeAVL<T> *curr) const {
+        /*if(!curr) {
+            return false;
         }
+        if(curr->data == data) {
+            return true;
+        }
+        return (Find(data, curr->left) || Find(data, curr->right));*/
+
+        if (!curr) {
+            return false;
+        } else if (curr->data == data) {
+            return true;
+        }
+        return Find(data, (data > curr->data) ? curr->right : curr->left);
     }
 
     bool Remove(T data, NodeAVL<T> *&curr) {
@@ -207,7 +209,7 @@ private:
                 current_node->data = min_node_value;
                 return isDiffHeight;
             } else {
-                NodeAVL<T>* to_remove = curr;
+                NodeAVL<T> *to_remove = curr;
                 if (!curr->left) {
                     curr = to_remove->right;
                     to_remove->right = NULL;
@@ -314,7 +316,7 @@ public:
      * Gets a key and finds it in the tree. If it exists - return its data.
      * Otherwise throws an exception.
      */
-    T &Find(T data) const {
+    bool Find(T data) const {
         //Wrapper for "Find" function
         return Find(data, root);
     }

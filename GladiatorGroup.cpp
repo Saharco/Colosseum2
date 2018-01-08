@@ -23,7 +23,6 @@ int GladiatorGroup::getId() const{
 }
 
 void GladiatorGroup::InsertScore(const int score) {
-//    Might throw exception
     scores->Insert(score);
 }
 

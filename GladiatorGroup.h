@@ -16,7 +16,6 @@ public:
     GladiatorGroup(const int id);
     GladiatorGroup(const GladiatorGroup& g);
     ~GladiatorGroup();
-//    void InitID(const int id);
     void InsertScore(const int score);
     int FindBiggest(int k) const;
     int getId() const;
