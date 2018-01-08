@@ -86,6 +86,7 @@ HashTable<T>::HashTable(KeyCalculator<T> *keyCalculator, T *array, int initial_s
 template<class T>
 HashTable<T>::~HashTable() {
     for(int i=0;i<table_length;i++){
+        table[i]->DeleteElements();
         delete(table[i]);
     }
     delete[] (table);
@@ -93,7 +94,7 @@ HashTable<T>::~HashTable() {
 template<class T>
 void HashTable<T>::insert(const T &x) {
     if (num_elements > table_length) {
-//        expand();
+      expand();
     }
     int position = h(x);
     try {

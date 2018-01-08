@@ -203,7 +203,6 @@ public:
         }
         Node *temp_next = iterator.current->next;
         Node *temp_prev = iterator.current->previous;
-        delete(iterator.current->data);
         delete (iterator.current);
         temp_prev->next = temp_next;
         temp_next->previous = temp_prev;
@@ -236,6 +235,14 @@ public:
         }
         throw ElementDoesntExist();
     }
+
+    void DeleteElements();
 };
+template <class T>
+void List<T>::DeleteElements() {
+    for (Iterator i = begin(); i != end(); i++){
+        delete(i.current->data);
+    }
+}
 
 #endif //HASHTABLE_LIST_H
